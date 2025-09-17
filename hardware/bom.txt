@@ -1,0 +1,12 @@
+-mounted PCB Mainboard (see gerber and bom files)
+-mounted PCB UserInterface (see gerber and bom files)
+-flat cable 16P 0.5mm Reverse 10cm P=0.5mm FFC Cable (Flexible Flat Cable) JUSHUO JS05B-16P-100-4-8
+-external connectors:
+	-6x 320V 15A 12 2.5 1 12~24 5.08mm 1x12P Green Plug P=5.08mm Pluggable System Terminal Block KF2EDGK-5.08-12P
+	-1x 3.81mm 300V 8A 10 1x10P Male Plug P=3.81mm Pluggable System Terminal Block ROHS WJ15EDGK-3.81-10P
+	-1x 3.81mm 300V 8A 2 1x2P Male Plug P=3.81mm Pluggable System Terminal Block ROHS WJ15EDGK-3.81-2P
+-din case
+	-1x Kradex ZD1012J ABS V0 12DIN enclosure
+	-2set Kradex ZD4TCJ ABS V0 cover protection
+	-1x UI panel printed (see stl folder)
+	-7x Screws
