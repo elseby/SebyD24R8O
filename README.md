@@ -5,9 +5,8 @@ The board features 24 relay outputs with a normally open contact and a capacity 
 - Shutters (2 channels required for each address, up/down)
 - Valve and pump activation on the thermal system
 
-![SebyD24R8O Device Image](images/3D_pcb_SebyD24R8O_PWCPU_front_1.1.png)
-![SebyD24R8O Device Image](images/3D_pcb_SebyD24R8O_UI_front_1.0.png)
-
+![SebyD24R8O Device Image](images/SebyD24R8O_mounted1.png)
+![SebyD24R8O Device Image](images/SebyD24R8O_mounted2.png)
 
 ## ✨ Features
 - DIN 12 module case
@@ -31,6 +30,9 @@ The board features 24 relay outputs with a normally open contact and a capacity 
 - **Bus Interface:** STKNX chip
     - Handles bus communication
     - Optoisolated
+
+![SebyD24R8O Device Image](images/3D_pcb_SebyD24R8O_PWCPU_front_1.1.png)
+![SebyD24R8O Device Image](images/3D_pcb_SebyD24R8O_UI_front_1.0.png)
 
 ---
 
