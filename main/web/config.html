@@ -10,61 +10,75 @@
         }
     </style>
     <script>
-        const types=[
-            {name:"---"},
-            {name:"SWITCH",vmax:1,vret:1,vsla:1,vigng:1, vgrp:1},
-            {name:"COVER",vmax:1,vigng:1, vgrp:1},
-            {name:"THERMO",wh1en:1},
+        const types = [
+            {name: "---"},
+            {name: "SWITCH", vmax: 1, vret: 1, vsla: 1, vigng: 1, vgrp: 1},
+            {name: "COVER", vmax: 1, vigng: 1, vgrp: 1},
+            {name: "THERMO", wh1en: 1},
         ]
-        const defRow={"ch":0 ,"type":0,"lbl":"","oppof":0,"wh0":0,"wh1":0,"rt":0,"mt":0,"sl":0,"igen":0,"gr":[0,0,0,0,0],"oppch":0};
+        const defRow = {
+            "ch": 0,
+            "type": 0,
+            "lbl": "",
+            "oppof": 0,
+            "wh0": 0,
+            "wh1": 0,
+            "rt": 0,
+            "mt": 0,
+            "sl": 0,
+            "igen": 0,
+            "gr": [0, 0, 0, 0, 0],
+            "oppch": 0
+        };
         let data;
         const getE = (id) => document.getElementById(id);
-        function newEl(tag, addTo, inHtml, attrs){
+
+        function newEl(tag, addTo, inHtml, attrs) {
             let el = document.createElement(tag);
-            if(addTo) addTo.append(el)
-            if(inHtml) el.innerHTML=inHtml
-            if(attrs){
-                Object.keys(attrs).forEach(k=>el.setAttribute(k,attrs[k]))
+            if (addTo) addTo.append(el)
+            if (inHtml) el.innerHTML = inHtml
+            if (attrs) {
+                Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]))
             }
             return el
         }
 
         // const types=["---","SWITCH","COVER","THERMO"]
-        const headLbl=["Ch","Type","Label","Where","MaxOnTime(mS)","Retain (mS)","Slave","Ignore A-GEN","G1","G2","G3","G4","G5","Opposite Ch."]
+        const headLbl = ["Ch", "Type", "Label", "Where", "MaxOnTime(mS)", "Retain (mS)", "Slave", "Ignore A-GEN", "G1", "G2", "G3", "G4", "G5", "Opposite Ch."]
 
-        function onTypeSel(v,idch){
-            data[idch]={...defRow,id:idch,type:Number(v)}
+        function onTypeSel(v, idch) {
+            data.channels[idch] = {...defRow, id: idch, type: Number(v)}
             drawRow(idch)
             vch(idch)
         }
 
-        function getTypeSel(type,idch){
-            let s=newEl("select",null,null,{onchange:"onTypeSel(this.value,"+idch+")"});
-            types.forEach((t,id)=> {
-                let e=newEl("option", s, t.name, {value: id})
-                if(id===type) e.setAttribute("selected","1")
+        function getTypeSel(type, idch) {
+            let s = newEl("select", null, null, {onchange: "onTypeSel(this.value," + idch + ")"});
+            types.forEach((t, id) => {
+                let e = newEl("option", s, t.name, {value: id})
+                if (id === type) e.setAttribute("selected", "1")
             })
             return s
         }
 
-        function getGrSel(idch,idxg,gr,onch){
-            let s=newEl("select",null,null,{id:('gr'+idch+"_"+idxg),...onch});
-            const vs=[]
+        function getGrSel(idch, idxg, gr, onch) {
+            let s = newEl("select", null, null, {id: ('gr' + idch + "_" + idxg), ...onch});
+            const vs = []
             newEl("option", s, "-", {value: 0})
-            Array.from(Array(9).keys()).forEach(g=>{
-                let e=newEl("option", s, "Group "+(g+1), {value: ''+(g+1)})
-                if((g+1)===gr) e.setAttribute("selected","1")
+            Array.from(Array(9).keys()).forEach(g => {
+                let e = newEl("option", s, "Group " + (g + 1), {value: '' + (g + 1)})
+                if ((g + 1) === gr) e.setAttribute("selected", "1")
             })
             return s
         }
 
-        function getWhSel(tdwh,ch,idch,onch) {
+        function getWhSel(tdwh, ch, idch, onch) {
             let s = newEl("select", null, null, {id: "wh0_" + idch, ...onch});
             const vs = []
             if (ch.type === 3) {
                 newEl("option", s, "---", {value: ""})
                 Array.from(Array(100).keys()).forEach(v1 => {
-                    const v=(v1 + 128).toString(16);
+                    const v = (v1 + 128).toString(16);
                     let e = newEl("option", s, "ZaZb " + v1, {value: v})
                     if (v === ch.wh0.toString(16)) e.setAttribute("selected", "1")
                 });
@@ -72,13 +86,13 @@
                 let s1 = newEl("select", null, null, {id: "wh1_" + idch, ...onch});
                 newEl("option", s1, "---", {value: ""})
                 Array.from(Array(9).keys()).forEach(v1 => {
-                    const v=(v1 + 49).toString(16);
-                    let e = newEl("option", s1, "N" + (v1+1), {value: v})
+                    const v = (v1 + 49).toString(16);
+                    let e = newEl("option", s1, "N" + (v1 + 1), {value: v})
                     if (v === ch.wh1.toString(16)) e.setAttribute("selected", "1")
                 });
 
-                let d = newEl("div", null, null, {style:"display:flex;"});
-                d.append(s,s1)
+                let d = newEl("div", null, null, {style: "display:flex;"});
+                d.append(s, s1)
                 tdwh.append(d)
             } else {
                 Array.from(Array(9).keys()).forEach(v1 => {
@@ -94,71 +108,73 @@
             }
         }
 
-        function setOppCh(idch,onch){
-            let td=newEl("td",getE("trch"+idch))
-            if(data[idch].type!==2)return;
-            let s = newEl("select",td,null,{id:"oppch"+idch,...onch});
+        function setOppCh(idch, onch) {
+            let td = newEl("td", getE("trch" + idch))
+            let {channels} = data
+            if (channels[idch].type !== 2) return;
+            let s = newEl("select", td, null, {id: "oppch" + idch, ...onch});
             newEl("option", s, "---", {value: ""});
-            data.forEach((ch,i) => {
-                if(!data[i].type && (data[idch].oppch===ch.id || !data.some(c1=>c1.type===2 && c1.oppch===ch.id))) {
-                    let e=newEl("option", s, "Channel " + (ch.id+1), {value: ch.id})
-                    if(data[idch].oppch===ch.id) e.setAttribute("selected","1")
+            channels.forEach((ch, i) => {
+                if (!channels[i].type && (channels[idch].oppch === ch.id || !channels.some(c1 => c1.type === 2 && c1.oppch === ch.id))) {
+                    let e = newEl("option", s, "Channel " + (ch.id + 1), {value: ch.id})
+                    if (channels[idch].oppch === ch.id) e.setAttribute("selected", "1")
                 }
             })
         }
-        function vch(idch){
-            let btn=getE("sbtn"+idch)
-            btn.setAttribute("disabled","1")
-            const ch=data[idch]
-            const ret={}
-            ret.type=ch.type;
-            ret.id=idch;
-            if(ch.type){
-                const type = types[ch.type]
-                ret.lbl=(getE("lbl"+idch).value||"");
-                let wh0=getE("wh0_"+idch)
-                if(!wh0 || !wh0.value) return
-                ret.wh0=wh0.value;
 
-                if(type.wh1en){
-                    let wh1=getE("wh1_"+idch)
-                    if(!wh1 || !wh1.value) return;
-                    ret.wh1=wh1.value;
+        function vch(idch) {
+            let btn = getE("sbtn" + idch)
+            btn.setAttribute("disabled", "1")
+            const ch = data.channels[idch]
+            const ret = {}
+            ret.type = ch.type;
+            ret.id = idch;
+            if (ch.type) {
+                const type = types[ch.type]
+                ret.lbl = (getE("lbl" + idch).value || "");
+                let wh0 = getE("wh0_" + idch)
+                if (!wh0 || !wh0.value) return
+                ret.wh0 = wh0.value;
+
+                if (type.wh1en) {
+                    let wh1 = getE("wh1_" + idch)
+                    if (!wh1 || !wh1.value) return;
+                    ret.wh1 = wh1.value;
                 }
 
-                if(type.vmax) {
+                if (type.vmax) {
                     ret.mt = getE("mt" + idch).value;
                 }
 
-                if(type.vigng) {
+                if (type.vigng) {
                     ret.igen = getE("igen" + idch).checked ? "on" : "off"
                 }
-                if(type.vgrp) {
+                if (type.vgrp) {
                     Array.from(Array(5).keys()).forEach(g => ret['grp' + (g + 1)] = getE('gr' + idch + "_" + g).value)
                 }
-                if(type.vret) {
-                    ret.rt=getE("rt"+idch).value;
+                if (type.vret) {
+                    ret.rt = getE("rt" + idch).value;
                 }
-                if(type.vsla) {
-                    ret.sl=getE("sl"+idch).checked ? "on" : "off"
+                if (type.vsla) {
+                    ret.sl = getE("sl" + idch).checked ? "on" : "off"
                 }
-                if(ch.type===2) {
-                    let oppch=getE("oppch"+idch).value
-                    if(!oppch)return
-                    ret.oppch=oppch;
+                if (ch.type === 2) {
+                    let oppch = getE("oppch" + idch).value
+                    if (!oppch) return
+                    ret.oppch = oppch;
                 }
             }
             btn.removeAttribute("disabled")
             return ret
         }
 
-        function setCh(idch){
-            let params=vch(idch);
-            if(params){
-                getE("resp").innerHTML="Sending..."
+        function setCh(idch) {
+            let params = vch(idch);
+            if (params) {
+                getE("resp").innerHTML = "Sending..."
                 var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = (t,e) => {
-                    if (xhr.status===200) {
+                xhr.onreadystatechange = (t, e) => {
+                    if (xhr.status === 200) {
                         getInfo();
                     }
                 };
@@ -169,80 +185,98 @@
             }
         }
 
-        function drawRow(idch){
-            const ch=data[idch]
-            const idtr = "trch"+idch
+        function drawRow(idch) {
+            const ch = data.channels[idch]
+            const idtr = "trch" + idch
             let tr = getE(idtr)
-            if(tr){
+            if (tr) {
                 tr.replaceChildren()
-            }else{
-                tr = newEl("tr",getE("tb"),null,{id:idtr})
+            } else {
+                tr = newEl("tr", getE("tb"), null, {id: idtr})
             }
-            newEl("td",tr,''+(ch.id+1))
-            const tdtype = newEl("td",tr)
-            var opch=data.find(c=>ch.type===0 && c.type===2 && c.oppch===ch.id)
-            if(!opch) {
+            newEl("td", tr, '' + (ch.id + 1))
+            const tdtype = newEl("td", tr)
+            var opch = data.channels.find(c => ch.type === 0 && c.type === 2 && c.oppch === ch.id)
+            if (!opch) {
                 tdtype.append(getTypeSel(ch.type, idch))
             }
-            if(ch.type){
-                const onch= {onchange:"vch("+idch+")"}
-                newEl("input",newEl("td",tr),null,{id:"lbl"+idch,value:ch.lbl,type:"text",maxlength:20,...onch})
+            if (ch.type) {
+                const onch = {onchange: "vch(" + idch + ")"}
+                newEl("input", newEl("td", tr), null, {
+                    id: "lbl" + idch,
+                    value: ch.lbl,
+                    type: "text",
+                    maxlength: 20, ...onch
+                })
 
-                const tdwh = newEl("td",tr)
-                getWhSel(tdwh,ch,idch,onch)
+                const tdwh = newEl("td", tr)
+                getWhSel(tdwh, ch, idch, onch)
                 const type = types[ch.type]
-                if(type.vmax){
-                    newEl("input",newEl("td",tr),null,{id:"mt"+idch,value:ch.mt||"",type:"number",min:"0",max:"86400000",...onch})
-                }else{
-                    newEl("td",tr)
+                if (type.vmax) {
+                    newEl("input", newEl("td", tr), null, {
+                        id: "mt" + idch,
+                        value: ch.mt || "",
+                        type: "number",
+                        min: "0",
+                        max: "86400000", ...onch
+                    })
+                } else {
+                    newEl("td", tr)
                 }
-                if(type.vret){
-                    newEl("input", newEl("td", tr), null, {id: "rt"+idch,value: ch.rt||"",type: "number",min: "0",max: "86400000",...onch})
-                }else{
-                    newEl("td",tr)
-                }
-
-                if(type.vsla) {
-                    const cbsl = newEl("input",newEl("td",tr),null,{id:"sl"+idch,type:"checkbox",...onch})
-                    if(ch.sl) cbsl.setAttribute("checked","")
-                }else{
-                    newEl("td",tr)
-                }
-
-                if(type.vigng) {
-                    const cbiag = newEl("input",newEl("td",tr),null,{id:"igen"+idch,type:"checkbox",...onch})
-                    if(ch.igen) cbiag.setAttribute("checked","")
-                }else{
-                    newEl("td",tr)
+                if (type.vret) {
+                    newEl("input", newEl("td", tr), null, {
+                        id: "rt" + idch,
+                        value: ch.rt || "",
+                        type: "number",
+                        min: "0",
+                        max: "86400000", ...onch
+                    })
+                } else {
+                    newEl("td", tr)
                 }
 
-                Array.from(Array(5).keys()).forEach(g=>{
-                    if(type.vgrp) {
+                if (type.vsla) {
+                    const cbsl = newEl("input", newEl("td", tr), null, {id: "sl" + idch, type: "checkbox", ...onch})
+                    if (ch.sl) cbsl.setAttribute("checked", "")
+                } else {
+                    newEl("td", tr)
+                }
+
+                if (type.vigng) {
+                    const cbiag = newEl("input", newEl("td", tr), null, {id: "igen" + idch, type: "checkbox", ...onch})
+                    if (ch.igen) cbiag.setAttribute("checked", "")
+                } else {
+                    newEl("td", tr)
+                }
+
+                Array.from(Array(5).keys()).forEach(g => {
+                    if (type.vgrp) {
                         const tdgr = newEl("td", tr)
                         tdgr.append(getGrSel(idch, g, ch.gr[g], onch))
-                    }else{
-                        newEl("td",tr)
+                    } else {
+                        newEl("td", tr)
                     }
                 })
 
-                setOppCh(idch,onch)
+                setOppCh(idch, onch)
 
-            }else{
+            } else {
 
-                Array.from(Array(11).keys()).forEach(a=>newEl("td",tr,"-"))
-                newEl("td", tr, opch ? "DOWN Ch. "+(opch.id+1) : "-")
+                Array.from(Array(11).keys()).forEach(a => newEl("td", tr, "-"))
+                newEl("td", tr, opch ? "DOWN Ch. " + (opch.id + 1) : "-")
             }
-            newEl("button",tr,"Set",{id:"sbtn"+idch,disabled:1,onclick:"setCh("+idch+")"})
+            newEl("button", tr, "Set", {id: "sbtn" + idch, disabled: 1, onclick: "setCh(" + idch + ")"})
         }
-        function getInfo(){
+
+        function getInfo() {
             var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = (t,e) => {
-                if (xhr.status===200) {
-                    let t=xhr.responseText
+            xhr.onreadystatechange = (t, e) => {
+                if (xhr.status === 200) {
+                    let t = xhr.responseText
                     try {
-                        data=JSON.parse(t);
+                        data = JSON.parse(t);
                         drawAll();
-                    }catch (e) {
+                    } catch (e) {
                         console.error(e)
                     }
                 }
@@ -250,14 +284,20 @@
             xhr.open("GET", "/chinfo", true);
             xhr.send();
         }
-        function drawAll(){
-            data.forEach((ch,idch)=>{
+
+        function drawAll() {
+            data.channels.forEach((ch, idch) => {
                 drawRow(idch)
             })
+            let e = getE("verel");
+            e.replaceChildren();
+            newEl("div", e, `Date:${data.app.date} ${data.app.time} Version:${data.app.ver}`)
         }
+
         const init = () => {
-            headLbl.forEach(l=> newEl("td",getE("th"),l))
-            data=Array.from(Array(32).keys()).map(idch=>({...defRow,id:idch+1}))
+            headLbl.forEach(l => newEl("td", getE("th"), l))
+            data = {channels: [], app: {}}
+            data.channels = Array.from(Array(32).keys()).map(idch => ({...defRow, id: idch + 1}))
             drawAll()
             console.log("init...")
             getInfo();
@@ -267,9 +307,12 @@
 <body onload="init()">
 <h1>SebyD24R8O Config</h1>
 <table>
-    <thead><tr id="th"></tr></thead>
+    <thead>
+    <tr id="th"></tr>
+    </thead>
     <tbody id="tb"></tbody>
 </table>
+<div id="verel"></div>
 <div id="resp"></div>
 <form method="post">
     <input type="submit" name="scmd" value="REBOOT"/>

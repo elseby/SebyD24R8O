@@ -1,5 +1,5 @@
 CompileFlags:
-  CompilationDatabase: build
+  CompilationDatabase: C:\Users\sebas\progetti\eclipse\SebyD24R8O\build
   Remove: [-m*, -f*]
 InlayHints: {BlockEnd: false, Designators: true, Enabled: true, ParameterNames: false,
   DeducedTypes: true, DefaultArguments: false, TypeNameLimit: 24}

@@ -4,6 +4,7 @@
  *  Created on: 19 mar 2025
  *      Author: elseby
  */
+#include "esp_app_desc.h"
 #include "include/utils.h"
 #include "esp_http_server.h"
 #include "include/channels.h"
@@ -280,7 +281,15 @@ esp_err_t sendChannelInfo(httpd_req_t *req){
 
 	httpd_resp_set_type(req, "application/json");
 
-	esp_err_t ret=httpd_resp_sendstr_chunk(req, "[");	
+ 	const esp_app_desc_t* espAppDescr = esp_app_get_description();
+
+	esp_err_t ret;
+	sprintf(buf,"{\"app\":{\"ver\":\"%s\",\"date\":\"%s\",\"time\":\"%s\"},\"channels\":["
+		,espAppDescr->version
+		,espAppDescr->date
+		,espAppDescr->time
+	);
+	ret = httpd_resp_sendstr_chunk(req, buf);
 	if(ret!=ESP_OK) return ret;
 	
 	for(int i=0;i<NUM_OF_CHANNELS;i++){
@@ -322,7 +331,7 @@ esp_err_t sendChannelInfo(httpd_req_t *req){
 		if(ret!=ESP_OK) return ret;
 	}
 
-	ret=httpd_resp_sendstr_chunk(req, "]");
+	ret=httpd_resp_sendstr_chunk(req, "]}");
 	if(ret!=ESP_OK) return ret;
 
 	ret = httpd_resp_send_chunk(req, buf,0);
