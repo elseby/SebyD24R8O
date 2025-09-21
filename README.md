@@ -42,7 +42,7 @@ The board features 24 relay outputs with a normally open contact and a capacity 
 to enable wifi AP press 25 and 32 channel buttons (channel 32 LED will change color).
 After connected to wifi AP the setup page is available at local address http://192.168.4.1. The websocket is available at address: ws://192.168.4.1/ws
 
-![Setup Web Page](images/ConfigWebPage.png)
+![Setup Web Page](images/WebConfigPage_1.png)
 
 ---
 
